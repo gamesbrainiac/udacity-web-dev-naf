@@ -34,10 +34,6 @@ form = """
 </html>
 """
 
-# In method, it does not matter if you write it in upper or
-# lower case, both 'post' and 'POST' will work.
-# When submitting data, always use POST
-
 from test_functions import *
 
 

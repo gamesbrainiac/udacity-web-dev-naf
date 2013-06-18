@@ -1,4 +1,5 @@
 import datetime
+import cgi
 
 
 def valid_day(day=""):
@@ -26,3 +27,8 @@ def valid_year(year=""):
         if 1900 <= year <= datetime.datetime.now().year:
             return year
     return None
+
+
+def escape_html(s=''):
+    if s:
+        return cgi.escape(s, quote=True)

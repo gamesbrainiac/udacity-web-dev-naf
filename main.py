@@ -44,15 +44,11 @@ from test_functions import *
 class MainHandler(webapp2.RequestHandler):
     def write_form(self, error="", month="", day="", year=""):
         self.response.out.write(form % {'error': error,
-                                        'month': month,
-                                        'day': day,
-                                        'year': year, })
+                                        'month': escape_html(month),
+                                        'day': escape_html(day),
+                                        'year': escape_html(year), })
 
     def get(self):
-        # This line below sets content to text/plain
-        # Meaning that it will print out nothing but
-        # plain text, so no HTML is rendered
-        # self.response.headers['Content-Type'] = 'text/plain'   # Uncomment to see effects of above comments
         self.write_form()
 
     def post(self):
@@ -66,24 +62,16 @@ class MainHandler(webapp2.RequestHandler):
 
         if not (month and day and year):
             self.write_form(error="Input invalid",
-                            month=month,
-                            day=day,
-                            year=year)
+                            month=user_month,
+                            day=user_day,
+                            year=user_year)
         else:
-            return self.response.out.write("Thanks for the form man! :D")
+            return self.redirect('/thanks', )
 
 
-# class TestHandler(webapp2.RedirectHandler):
-#     # This defines what happens when a GET request is sent to the server
-#     def get(self):
-#         q = self.request.get("q")
-#         self.response.write(q)
-#
-#     def post(self):
-#         self.response.headers['Content-Type'] = 'text/plain'  # Sets content to text/plain
-#         self.response.out.write(self.request)                 # Prints out the entire request
-#         # q = self.request.get("q")
-#         # self.response.write(q)
+class ThanksHandler(webapp2.RequestHandler):
+    def get(self):
+        return self.response.out.write("Thanks for the form man! :D")
 
 
 app = webapp2.WSGIApplication([

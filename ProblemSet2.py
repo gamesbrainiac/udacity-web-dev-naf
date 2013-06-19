@@ -1,10 +1,5 @@
-import cgi
 import string
 import re
-
-
-def escape_html(html=''):
-    return cgi.escape(html, quote=True)
 
 
 def rotate_thirteen(input_string=''):
@@ -19,14 +14,14 @@ def validate_username(username=''):
     return USER_RE.match(username)
 
 
-def validate_password(password=''):
+def validate_password(password='', verify=''):
     PASS_RE = re.compile(r'^.{3,20}$')
-    return PASS_RE.match(password)
+    return verify == password and PASS_RE.match(password)
 
 
 def validate_email(email=''):
     EMAIL_RE = re.compile(r'^[\S]+@[\S]+\.[\S]+$')
-    if email == '':
+    if not email:
         return True
     else:
         return EMAIL_RE.match(email)

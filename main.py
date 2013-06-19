@@ -36,7 +36,10 @@ class HomePageHandler(GenericHandler):
 class ThanksHandler(GenericHandler):
 
     def get(self):
-        return self.render_template('thanks.html')
+        username = str(self.request.get('username'))
+        return self.render_template('thanks.html', context_data={
+            'username': username,
+        })
 
 
 class Rot13(GenericHandler):
@@ -89,7 +92,7 @@ class SignupHandler(GenericHandler):
         return_context = {key: value for key, value in return_context.items() if value}
 
         if not(username_error or password_error or email_error):
-            return self.redirect('/thanks')
+            return self.redirect('/thanks?username=' + username)
         else:
             return self.render_template('signup.html', return_context)
 

@@ -1,0 +1,25 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+    <form action="" method="post">
+        <label for="Title">
+            Title:
+            <br>
+            <input type="text" name="subject" value="{{ subject }}"/>
+            <br>
+        </label>
+        <label for="Content">
+            Content:
+            <br>
+            <textarea name="content" cols="30" rows="10">{{ content }}</textarea>
+            <br>
+        </label>
+        <input type="submit"/>
+    </form>
+    <div class="error">{{ error }}</div>
+    <div>
+        <p>
+            <a href="/blog">Go Back</a>
+        </p>
+    </div>
+{% endblock %}

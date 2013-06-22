@@ -1,33 +1,25 @@
-{% extends '_layout/base.html' %}
+{% extends 'layouts/base.html' %}
 
-{% block title %}Make a new Post!{% endblock %}
-
-{% block css %}
-    <style type="text/css">
-        .error {
-            color: darkred;
-        }
-    </style>
-{% endblock %}
-
-{% block body %}
+{% block content %}
     <form action="" method="post">
-        <label for="Text">
+        <label for="Title">
             Title:
             <br>
             <input type="text" name="title" value="{{ title }}"/>
+            <br>
         </label>
-        <br>
         <label for="Content">
             Content:
             <br>
             <textarea name="content" cols="30" rows="10">{{ content }}</textarea>
+            <br>
         </label>
-        <br>
         <input type="submit"/>
     </form>
-    <div class="error">
-        {{ error }}
+    <div class="error">{{ error }}</div>
+    <div>
+        <p>
+            <a href="/blog">Go Back</a>
+        </p>
     </div>
-
 {% endblock %}

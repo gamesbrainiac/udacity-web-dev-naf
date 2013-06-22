@@ -2,8 +2,8 @@
 
 
 {% block content %}
-    <h1>{{ post.title }}</h1>
-    <p>{{ post.content }}</p>
+    <h1>{{ post.subject }}</h1>
+    <p>{{ post.render()|safe }}</p>
     <div>
         <p>
             <a href="/blog">Go Back</a>

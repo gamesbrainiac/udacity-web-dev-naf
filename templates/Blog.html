@@ -1,0 +1,23 @@
+{% extends '_layout/base.html' %}
+
+{% block title %}
+    My Blog
+{% endblock %}
+
+{% block body %}
+    {% for post in blog_posts %}
+        <div class="post">
+            <div class="post-title">
+                <a href="/blog/{{ post.key().id_or_name() }}">{{ post.title }}</a>
+            </div>
+            <br>
+            <div class="post-content">
+                {{ post.content }}
+            </div>
+            <br>
+            <div class="post-time">
+                {{ post.created_at }}
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}

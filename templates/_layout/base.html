@@ -3,14 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}{% endblock %}</title>
-{#    <link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet">#}
+{#    <link rel="stylesheet" type="text/css" href="/static/css/bootstrap.css"/>#}
+{#    <link rel="stylesheet" type="text/css" href="/static/css/bootstrap-responsive.css"/>#}
     {% block css %}{% endblock %}
 </head>
 <body>
-    {% block body %}{% endblock %}
+    <div class="container">
+        {% block body %}{% endblock %}
+    </div>
 
-{#    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>#}
-{#    <script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>#}
+{#    <script type="text/javascript" src="/static/js/bootstrap.min.js"></script>#}
     {% block scripts %}{% endblock %}
 </body>
 </html>

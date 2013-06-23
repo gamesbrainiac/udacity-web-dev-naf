@@ -5,6 +5,7 @@ import webapp2
 import jinja2
 
 import security
+from validate_creds import *
 
 # Setting directory for template files
 TEMPLATE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), 'templates'))
@@ -60,8 +61,59 @@ class MainPage(Handler):
             self.write("You have visited this page %s times" % visits)
 
 
-# External list to handle our page request
+class SignupPage(Handler):
+
+    # Rendering basic login page
+    def get(self):
+        return self.render('SignupPage.html')
+
+    def post(self):
+        # Take in all user input
+        username = str(self.request.get('username'))
+        password = str(self.request.get('password'))
+        verify = str(self.request.get('verify'))
+        email = str(self.request.get('email'))
+
+        # Validate things
+        error = ''
+        if not validate_username(username):
+            error += 'Invalid username. '
+
+        if not validate_password(password, verify):
+            error += 'Invalid password or passwords do not match. '
+
+        if not validate_email(email):
+            error += 'Invalid email.'
+
+        # All things good, then we head for making cookies
+        if error == '':
+            auth_cookie_str = security.make_pw_hash(username, password)
+            self.response.headers.add_header('Set-Cookie', 'auth=%s;Path=/' % auth_cookie_str)
+            self.response.headers.add_header('Set-Cookie', 'name=%s;Path=/' % username)
+            return self.redirect('/welcome')
+        else:
+            return self.render('SignupPage.html',
+                               username=username,
+                               email=email,
+                               error=error, )
+
+
+class WelcomePage(Handler):
+
+    def get(self):
+        name_cookie_str = self.request.cookies.get('name')
+
+        if name_cookie_str:
+            name_cookie_val = str(name_cookie_str)
+            return self.render('WelcomePage.html', username=name_cookie_val)
+        else:
+            return self.redirect('/signup')
+
+
+# External list to handle our page request (looks prettier)
 page_list = [
-    ('/', MainPage)
+    ('/', MainPage),
+    ('/signup', SignupPage),
+    ('/welcome', WelcomePage),
 ]
 app = webapp2.WSGIApplication(page_list, debug=True)

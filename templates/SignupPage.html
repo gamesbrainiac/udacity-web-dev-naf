@@ -1,0 +1,35 @@
+{% extends 'layouts/base.html' %}
+
+
+{% block content %}
+    <form action="" method="post">
+        <label for="username">
+            Username:
+            <br>
+            <input type="text" name="username" id="username" value="{{ username }}" required=""/>
+            <br>
+        </label>
+        <label for="password">
+            Password:
+            <br>
+            <input type="password" name="password" id="password" value="{{ password }}" required=""/>
+            <br>
+        </label>
+        <label for="verify">
+            Verify password:
+            <br>
+            <input type="password" name="verify" id="verify" value="{{ verify }}" required=""/>
+            <br>
+        </label>
+        <label for="email">
+            Email (optional):
+            <br>
+            <input type="text" name="email" id="email" value="{{ email }}"/>
+            <br>
+        </label>
+        <input type="submit"/>
+        <div class="error" style="color: red">
+            {{ error }}
+        </div>
+    </form>
+{% endblock %}

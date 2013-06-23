@@ -3,6 +3,7 @@ import os
 
 import webapp2
 import jinja2
+from google.appengine.ext import db
 
 import security
 from validate_creds import *
@@ -12,6 +13,12 @@ TEMPLATE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), 'template
 
 # Creating the jinja environment
 JINJA_ENV = jinja2.Environment(loader=jinja2.FileSystemLoader(TEMPLATE_DIR), autoescape=True)
+
+
+class User(db.Model):  # Todo create a user model, that works with your login page
+    username = db.StringProperty(required=True)
+    password = db.StringProperty(required=True)
+    email = db.StringProperty(default='')
 
 
 # Creating generic page handler class
@@ -85,9 +92,34 @@ class SignupPage(Handler):
         if not validate_email(email):
             error += 'Invalid email.'
 
-        # All things good, then we head for making cookies
+        # All things good, then we head for making cookies otherwise, re-render page
         if error == '':
-            auth_cookie_str = security.make_pw_hash(username, password)
+            users = db.GqlQuery("SELECT * FROM User")  # Getting all users
+            user = None  # Setting default to None, because that means that we can add this user
+
+            # Looping through users
+            for var in users:
+                if var.username == username:
+                    user = username
+
+            # If there was another user with the same username
+            if user:
+
+                # Render back the page, with an error
+                return self.render('SignupPage.html',
+                                   username=username,
+                                   email=email,
+                                   error='Username already exists')
+            else:  # If user does not exist
+
+                # Making a cookie from username and password
+                auth_cookie_str = security.make_pw_hash(username, password)
+
+                # save the username and hash to the database, as well as the email
+                new_user = User(username=username, password=auth_cookie_str, email=email)
+                new_user.put()
+
+            # Adding cookie headers for re-direct
             self.response.headers.add_header('Set-Cookie', 'auth=%s;Path=/' % auth_cookie_str)
             self.response.headers.add_header('Set-Cookie', 'name=%s;Path=/' % username)
             return self.redirect('/welcome')
@@ -98,14 +130,46 @@ class SignupPage(Handler):
                                error=error, )
 
 
+class LoginPage(Handler):
+
+    def get(self):
+        return self.render('LoginPage.html')
+
+    def post(self):
+        username = str(self.request.get('username'))
+        password = str(self.request.get('password'))
+
+        users = db.GqlQuery("SELECT * FROM User")
+
+        hash_value = None
+
+        for var in users:
+            if var.username == username:
+                hash_value = var.password
+
+        if hash_value:
+            if security.validate_pw(username, password, hash_value):
+                self.response.headers.add_header('Set-Cookie', 'auth=%s;Path=/' % str(hash_value))
+                self.response.headers.add_header('Set-Cookie', 'name=%s;Path=/' % str(username))
+                return self.redirect('/welcome')
+        else:
+            return self.render('LoginPage.html',
+                               username=username,
+                               password='',
+                               error='Username invalid',)
+
+
 class WelcomePage(Handler):
 
     def get(self):
-        name_cookie_str = self.request.cookies.get('name')
+        # Getting the name cookie
+        name_cookie_str = self.request.cookies.get('name')  # TODO: Change the way the username is take in
 
+        # If we could get a name cookie
         if name_cookie_str:
             name_cookie_val = str(name_cookie_str)
             return self.render('WelcomePage.html', username=name_cookie_val)
+        # Otherwise, the person is not a valid user <<< Possible use of database here.
         else:
             return self.redirect('/signup')
 
@@ -113,6 +177,7 @@ class WelcomePage(Handler):
 # External list to handle our page request (looks prettier)
 page_list = [
     ('/', MainPage),
+    ('/login', LoginPage),
     ('/signup', SignupPage),
     ('/welcome', WelcomePage),
 ]

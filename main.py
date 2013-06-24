@@ -15,7 +15,7 @@ TEMPLATE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), 'template
 JINJA_ENV = jinja2.Environment(loader=jinja2.FileSystemLoader(TEMPLATE_DIR), autoescape=True)
 
 
-class User(db.Model):  # Todo create a user model, that works with your login page
+class User(db.Model):
     username = db.StringProperty(required=True)
     password = db.StringProperty(required=True)
     email = db.StringProperty(default='')
@@ -24,9 +24,11 @@ class User(db.Model):  # Todo create a user model, that works with your login pa
 # Creating generic page handler class
 class Handler(webapp2.RequestHandler):
 
+    # Simply a cover function to make things faster and more legible
     def write(self, *args, **kwargs):
         return self.response.out.write(*args, **kwargs)
 
+    # Renders template, with HTML file and named arguments
     def render(self, template, **kwargs):
         template = JINJA_ENV.get_template(template)
         return self.write(template.render(**kwargs))
@@ -34,8 +36,9 @@ class Handler(webapp2.RequestHandler):
 
 class MainPage(Handler):
 
+    # Basig get function for any GET request from the user
     def get(self):
-        # Setting content type to text
+        # Setting content type to text/plain, for visibility
         self.response.headers['Content-Type'] = 'text/plain'
 
         visits = 0  # Settings default value
@@ -51,6 +54,7 @@ class MainPage(Handler):
             if cookie_val:
                 visits = int(cookie_val)
 
+        # Incrementing cookie value
         visits += 1
 
         new_cookie_val = security.make_secure_val(str(visits))
@@ -159,6 +163,14 @@ class LoginPage(Handler):
                                error='Username invalid',)
 
 
+class LogoutPage(Handler):
+
+    def get(self):
+        self.response.headers.add_header('Set-Cookie', 'auth=%s;Path=/' % '')
+        self.response.headers.add_header('Set-Cookie', 'name=%s;Path=/' % '')
+        return self.redirect('/signup')
+
+
 class WelcomePage(Handler):
 
     def get(self):
@@ -180,5 +192,6 @@ page_list = [
     ('/login', LoginPage),
     ('/signup', SignupPage),
     ('/welcome', WelcomePage),
+    ('/logout', LogoutPage),
 ]
 app = webapp2.WSGIApplication(page_list, debug=True)
